@@ -2,9 +2,10 @@ const router = require('express').Router();
 const Job = require('../models/Job.model');
 const mongoose = require('mongoose');
 const moment = require('moment');
+const { isAuthenticated } = require('../middleware/jwt.middleware');
 
 // Create a new job
-router.post('/jobs', async (req, res, next) => {
+router.post('/jobs', isAuthenticated, async (req, res, next) => {
   const {
     companyName,
     address,
@@ -26,13 +27,11 @@ router.post('/jobs', async (req, res, next) => {
       description,
     });
 
-    // Format dates and times
     const formattedFromDate = moment(newJob.date.from).format(
       'YYYY-MM-DD HH:mm'
     );
     const formattedToDate = moment(newJob.date.to).format('YYYY-MM-DD HH:mm');
 
-    // Send the response with formatted dates and times
     res.status(201).json({
       ...newJob.toObject(),
       date: {
@@ -42,7 +41,7 @@ router.post('/jobs', async (req, res, next) => {
     });
   } catch (error) {
     console.log('An error occurred creating the job', error);
-    next(error); // Pass the error to the error handling middleware
+    next(error);
   }
 });
 
@@ -53,6 +52,18 @@ router.get('/jobs', async (req, res, next) => {
     res.json(allJobs);
   } catch (error) {
     console.log('An error occurred getting all jobs', error);
+    next(error);
+  }
+});
+
+// Gets all jobs
+router.get('/my-jobs/:companyName', isAuthenticated, async (req, res, next) => {
+  const { companyName } = req.params;
+  try {
+    const myJobs = await Job.find({ companyName });
+    res.json(myJobs);
+  } catch (error) {
+    console.log('An error occurred getting my jobs', error);
     next(error);
   }
 });
@@ -76,7 +87,7 @@ router.get('/jobs/:id', async (req, res, next) => {
 });
 
 // Update job by id
-router.put('/jobs/:id', async (req, res, next) => {
+router.put('/jobs/:id', isAuthenticated, async (req, res, next) => {
   const { id } = req.params;
   const {
     companyName,
@@ -122,7 +133,7 @@ router.put('/jobs/:id', async (req, res, next) => {
 });
 
 // Delete job by id
-router.delete('/jobs/:id', async (req, res, next) => {
+router.delete('/jobs/:id', isAuthenticated, async (req, res, next) => {
   const { id } = req.params;
 
   try {

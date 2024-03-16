@@ -2,12 +2,8 @@ const router = require('express').Router();
 const mongoose = require('mongoose');
 const Student = require('../models/Student.model');
 
-// Import student controller
-// const studentController = require('../controllers/studentController');
-
-// Define routes
 router.post('/students', async (req, res, next) => {
-  const { name, age, address, degree, experience } = req.body;
+  const { name, age, address, degree, experience, userId } = req.body;
 
   try {
     const newStudent = await Student.create({
@@ -16,6 +12,7 @@ router.post('/students', async (req, res, next) => {
       address,
       degree,
       experience,
+      user: userId,
     });
     console.log('New student', newStudent);
     res.status(201).json(newStudent);

@@ -12,6 +12,7 @@ const User = require('../models/User.model');
 
 // Require necessary (isAuthenticated) middleware in order to control access to specific routes
 const { isAuthenticated } = require('../middleware/jwt.middleware.js');
+const Employer = require('../models/Employer.model.js');
 
 // How many rounds should bcrypt run the salt (default - 10 rounds)
 const saltRounds = 10;
@@ -119,13 +120,28 @@ router.post('/login', (req, res, next) => {
 });
 
 // GET  /auth/verify  -  Used to verify JWT stored on the client
-router.get('/verify', isAuthenticated, (req, res, next) => {
+router.get('/verify', isAuthenticated, async (req, res, next) => {
   // If JWT token is valid the payload gets decoded by the
   // isAuthenticated middleware and is made available on `req.payload`
   console.log(`req.payload`, req.payload);
 
+  const employer = await Employer.findOne({ user: req.payload._id });
+  if (!employer) {
+    // If no employer is found, send an error response
+    return res.status(404).json({ message: 'Employer not found' });
+  }
+
+  const { companyName, companyAddress, tripAdvisorRanking, restaurantTypes } =
+    employer;
+
   // Send back the token payload object containing the user data
-  res.status(200).json(req.payload);
+  res.status(200).json({
+    ...req.payload,
+    companyName,
+    companyAddress,
+    tripAdvisorRanking,
+    restaurantTypes,
+  });
 });
 
 module.exports = router;

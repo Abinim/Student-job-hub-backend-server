@@ -4,15 +4,23 @@ const mongoose = require('mongoose');
 
 // Created a new employer
 router.post('/employers', async (req, res, next) => {
-  const { companyName, companyAddress, tripAdvisorRanking, restaurantTypes } =
-    req.body;
+  const {
+    name,
+    companyName,
+    companyAddress,
+    tripAdvisorRanking,
+    restaurantTypes,
+    userId,
+  } = req.body;
 
   try {
     const newEmployer = await Employer.create({
+      name,
       companyName,
       companyAddress,
       tripAdvisorRanking,
       restaurantTypes,
+      user: userId,
     });
 
     console.log('New employer', newEmployer);

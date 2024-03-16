@@ -13,23 +13,17 @@ require('./config')(app);
 
 const { isAuthenticated } = require('./middleware/jwt.middleware');
 
-// Define route handler for the root URL
+// const indexRoutes = require('./routes/index.routes');
+// app.use('/api', indexRoutes);
 
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
-
-const indexRoutes = require('./routes/index.routes');
-app.use('/api', indexRoutes);
+const jobsRoutes = require('./routes/jobs.routes');
+app.use('/api', jobsRoutes);
 
 const employersRoutes = require('./routes/employers.routes');
 app.use('/api', isAuthenticated, employersRoutes);
 
 const studentsRoutes = require('./routes/students.routes');
 app.use('/api', isAuthenticated, studentsRoutes);
-
-const jobsRoutes = require('./routes/jobs.routes');
-app.use('/api', isAuthenticated, jobsRoutes);
 
 const authRoutes = require('./routes/auth.routes');
 app.use('/auth', authRoutes);

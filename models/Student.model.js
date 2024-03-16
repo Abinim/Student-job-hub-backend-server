@@ -8,6 +8,7 @@ const studentSchema = new Schema({
   address: { type: String },
   degree: { type: String },
   experience: { type: String },
+  user: { type: Schema.Types.ObjectId, ref: 'User' },
 });
 
 const Student = model('Student', studentSchema);
