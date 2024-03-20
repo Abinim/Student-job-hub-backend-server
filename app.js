@@ -13,9 +13,6 @@ require('./config')(app);
 
 const { isAuthenticated } = require('./middleware/jwt.middleware');
 
-// const indexRoutes = require('./routes/index.routes');
-// app.use('/api', indexRoutes);
-
 const jobsRoutes = require('./routes/jobs.routes');
 app.use('/api', jobsRoutes);
 
