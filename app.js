@@ -16,6 +16,9 @@ const { isAuthenticated } = require('./middleware/jwt.middleware');
 const jobsRoutes = require('./routes/jobs.routes');
 app.use('/api', jobsRoutes);
 
+const appliedRoutes = require('./routes/applied.routes');
+app.use('/api', appliedRoutes);
+
 const employersRoutes = require('./routes/employers.routes');
 app.use('/api', isAuthenticated, employersRoutes);
 
