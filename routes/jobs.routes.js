@@ -5,43 +5,36 @@ const moment = require('moment');
 const { isAuthenticated } = require('../middleware/jwt.middleware');
 
 // Create a new job
+// Backend Changes
 router.post('/jobs', isAuthenticated, async (req, res, next) => {
   const {
     companyName,
     address,
-    date: { from, to },
+    fromDate,
+    toDate,
     shift,
     paymentPerHour,
     description,
   } = req.body;
+
   try {
-    const fromDate = moment(from, 'DD-MM-YYYY, h:mm A').toDate();
-    const toDate = moment(to, 'DD-MM-YYYY, h:mm A').toDate();
+    // Convert dates to ISO 8601 format
+    const fromDateISO = new Date(fromDate).toISOString();
+    const toDateISO = new Date(toDate).toISOString();
 
     const newJob = await Job.create({
       companyName,
       address,
-      date: { from: fromDate, to: toDate },
+      date: { from: fromDateISO, to: toDateISO },
       shift,
       paymentPerHour,
       description,
     });
 
-    const formattedFromDate = moment(newJob.date.from).format(
-      'YYYY-MM-DD HH:mm'
-    );
-    const formattedToDate = moment(newJob.date.to).format('YYYY-MM-DD HH:mm');
-
-    res.status(201).json({
-      ...newJob.toObject(),
-      date: {
-        from: formattedFromDate,
-        to: formattedToDate,
-      },
-    });
+    res.status(201).json(newJob);
   } catch (error) {
     console.log('An error occurred creating the job', error);
-    next(error);
+    res.status(500).json({ message: 'Internal server error' });
   }
 });
 
@@ -103,8 +96,8 @@ router.put('/jobs/:id', isAuthenticated, async (req, res, next) => {
       return res.status(400).json({ message: 'Id is not valid' });
     }
 
-    const fromDate = moment(from, 'DD-MM-YYYY, h:mm A').toDate();
-    const toDate = moment(to, 'DD-MM-YYYY, h:mm A').toDate();
+    const fromDate = moment(from).toDate();
+    const toDate = moment(to).toDate();
 
     const updatedJob = await Job.findByIdAndUpdate(
       id,
